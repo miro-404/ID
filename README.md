@@ -43,13 +43,29 @@ Entrevista → ficha.yaml
 
 ## Instalación
 
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/miro-404/ID.git
+cd ID
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -e .
+copy .env.example .env
+notepad .env        # pega tu ANTHROPIC_API_KEY y guarda
+```
+
+**macOS / Linux:**
+
 ```bash
-git clone <url-de-este-repo>
-cd oficina-agentes-academicos
-python -m venv .venv && source .venv/bin/activate   # en Windows: .venv\Scripts\activate
+git clone https://github.com/miro-404/ID.git
+cd ID
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
 cp .env.example .env    # y completa ANTHROPIC_API_KEY
 ```
+
+El archivo `.env` se lee automáticamente al ejecutar la oficina desde la carpeta del proyecto.
 
 ## Uso
 

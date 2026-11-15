@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -17,6 +18,31 @@ from .entrevista import entrevistar
 from .ficha import Ficha
 
 RAIZ_PRODUCCIONES = Path("producciones")
+
+
+def _cargar_env(ruta: Path = Path(".env")) -> None:
+    """Carga variables de un archivo .env (sin sobrescribir las ya definidas)."""
+    if not ruta.is_file():
+        return
+    for linea in ruta.read_text(encoding="utf-8-sig").splitlines():
+        linea = linea.strip()
+        if not linea or linea.startswith("#") or "=" not in linea:
+            continue
+        clave, valor = linea.split("=", 1)
+        clave, valor = clave.strip(), valor.strip().strip('"').strip("'")
+        if valor and clave not in os.environ:
+            os.environ[clave] = valor
+
+
+def _preparar_consola() -> None:
+    """Evita errores de codificación con tildes y símbolos en PowerShell/CMD."""
+    for flujo in (sys.stdout, sys.stderr):
+        try:
+            flujo.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+    if os.name == "nt":
+        os.system("")  # activa los colores ANSI en la consola de Windows
 
 
 def _ejecutar(ficha: Ficha, carpeta: Path) -> None:
@@ -32,7 +58,9 @@ def _ejecutar(ficha: Ficha, carpeta: Path) -> None:
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(prog="oficina", description="Oficina de Agentes Académicos")
+    _preparar_consola()
+    _cargar_env()
+    ap =argparse.ArgumentParser(prog="oficina", description="Oficina de Agentes Académicos")
     sub = ap.add_subparsers(dest="cmd", required=True)
     n = sub.add_parser("nueva", help="Nueva producción (entrevista inicial)")
     n.add_argument("--solo-ficha", action="store_true", help="Crear la ficha sin ejecutar")
