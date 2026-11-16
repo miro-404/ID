@@ -140,3 +140,23 @@ Con el borrador `07_borrador_vN.md`:
 - No hagas tú el trabajo de los subagentes, salvo el plan del director. Así cada rol mantiene su independencia y tu contexto no se satura.
 - No leas el corpus completo ni los borradores enteros si no es necesario: los subagentes trabajan con los archivos y te devuelven resúmenes.
 - Si el uso del plan de Claude se agota a mitad de la producción, no pasa nada. Todo queda en archivos, y el usuario puede retomar con `/investigacion producciones/<carpeta>`.
+
+## Oficina visual (interfaz pixel)
+
+La oficina visual está publicada en https://claude.ai/artifact/QS9om2YapKnbJo79HMhVZ3 (fuente: `interfaz/oficina.html`). Mantenla al día con la herramienta `ArtifactData` sobre esa URL. Siempre lee el documento antes de escribir y pasa su `version` como `if_version`.
+
+- **Estado del equipo:** documento `oficina/estado`, con los campos:
+  - `produccion`: título de la producción en curso.
+  - `agentes.<id>`: `{estado: "libre" | "trabajando" | "esperando", tarea}`. Los ids son los de los subagentes, más `director`.
+  - `eventos`: lista de `{t, agente, texto}` para la bitácora. Conserva solo los últimos 40.
+
+  Antes de invocar a un subagente, ponlo en `trabajando` con su tarea. Al terminar, devuélvelo a `libre` y añade un evento a la bitácora.
+- **Solicitudes al usuario:** cuando necesites una decisión, información o un permiso del usuario, crea un documento en la colección `solicitudes` con estos campos:
+  - `num`, `agente`, `creada` (ISO).
+  - `tipo`: `pregunta` o `permiso`.
+  - `titulo` y `detalle`.
+  - `opciones`: lista de `{etiqueta, descripcion}`. Opcional.
+  - `multiple`: booleano.
+  - `estado: "pendiente"`.
+
+  Pon al agente que pregunta en `esperando`. La página hace sonar una alarma al aparecer la solicitud. El usuario responde ahí: el documento pasa a `estado: "respondida"`, con `respuesta` y `seleccion`. Léelo con `ArtifactData` cuando el usuario avise en el chat, o antes de continuar. Si responde directamente en el chat, marca tú la solicitud como respondida.
